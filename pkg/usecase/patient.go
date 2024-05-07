@@ -6,6 +6,9 @@ import (
 	"patient-service/pkg/models"
 	interfaces "patient-service/pkg/repository/interface"
 	usecaseint "patient-service/pkg/usecase/interface"
+
+	"github.com/jinzhu/copier"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type patientUseCase struct {
@@ -60,4 +63,40 @@ func (pr *patientUseCase) PatientsSignUp(patient models.PatientSignUp) (models.T
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
+}
+func (pr *patientUseCase)PatientLogin(patient models.PatientLogin)(models.TokenPatient,error)  {
+		email, err := pr.patientRepository.CheckPatientExistsByEmail(patient.Email)
+		if err != nil {
+			return models.TokenPatient{}, errors.New("error with server")
+		}
+		if email == nil {
+			return models.TokenPatient{}, errors.New("email doesn't exist")
+		}
+		patientdetails, err := pr.patientRepository.FindPatientByEmail(patient.Email)
+		if err != nil {
+			return models.TokenPatient{}, err
+		}
+		err = bcrypt.CompareHashAndPassword([]byte(patientdetails.Password), []byte(patient.Password))
+		if err != nil {
+			return models.TokenPatient{}, errors.New("password not matching")
+		}
+		var patientDetails models.SignupdetailResponse
+		err = copier.Copy(&patientDetails, &patientdetails)
+		if err != nil {
+			return models.TokenPatient{}, err
+		}
+		accessToken, err := helper.GenerateAccessToken(patientDetails)
+		if err != nil {
+			return models.TokenPatient{}, errors.New("couldn't create accesstoken due to internal error")
+		}
+		refreshToken, err := helper.GenerateRefreshToken(patientDetails)
+		if err != nil {
+			return models.TokenPatient{}, errors.New("counldn't create refreshtoken due to internal error")
+		}
+		return models.TokenPatient{
+			Patient:         patientDetails,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+		}, nil
+	
 }

@@ -54,3 +54,11 @@ func (ur *patientRepository) PatientSignUp(patient models.PatientSignUp) (models
 	}
 	return signupDetail, nil
 }
+func (ur *patientRepository)FindPatientByEmail(email string)(models.PatientDetails,error)  {
+	var patientdetail models.PatientDetails
+	err := ur.DB.Raw("SELECT * FROM patient WHERE email=?", email).Scan(&patientdetail).Error
+	if err != nil {
+		return models.PatientDetails{}, errors.New("error checking user details")
+	}
+	return patientdetail, nil
+}

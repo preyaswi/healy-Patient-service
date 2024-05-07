@@ -1,4 +1,5 @@
 package models
+
 type PatientSignUp struct {
 	Fullname        string
 	Email           string
@@ -8,16 +9,28 @@ type PatientSignUp struct {
 	Contactnumber   string
 }
 type SignupdetailResponse struct {
-    Id            uint  `json:"id"`
-    Fullname      string `json:"fullname"`
-    Email         string `json:"email"`
-    Gender        string `json:"gender"`
-    Contactnumber string `json:"contactnumber"`
+	Id            uint   `json:"id"`
+	Fullname      string `json:"fullname"`
+	Email         string `json:"email"`
+	Gender        string `json:"gender"`
+	Contactnumber string `json:"contactnumber"`
 }
 
 type TokenPatient struct {
-	Patient         SignupdetailResponse
+	Patient      SignupdetailResponse
 	AccessToken  string
 	RefreshToken string
 }
 
+type PatientLogin struct {
+	Email    string
+	Password string
+}
+type PatientDetails struct {
+	Id            uint
+	Fullname      string
+	Email         string
+	Password  string
+	Gender        string
+	Contactnumber string
+}
