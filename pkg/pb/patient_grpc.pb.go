@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Patient_PatientSignUp_FullMethodName = "/Patient.Patient/PatientSignUp"
-	Patient_PatientLogin_FullMethodName  = "/Patient.Patient/PatientLogin"
+	Patient_PatientSignUp_FullMethodName = "/patient.Patient/PatientSignUp"
+	Patient_PatientLogin_FullMethodName  = "/patient.Patient/PatientLogin"
 )
 
 // PatientClient is the client API for Patient service.
@@ -129,7 +129,7 @@ func _Patient_PatientLogin_Handler(srv interface{}, ctx context.Context, dec fun
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Patient_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "Patient.Patient",
+	ServiceName: "patient.Patient",
 	HandlerType: (*PatientServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
