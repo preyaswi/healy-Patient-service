@@ -15,7 +15,6 @@ func InitializeApi(cfg config.Config) (*server.Server, error) {
 		return nil, err
 	}
 	patientRepository := repository.NewPatientRepository(gormDB)
-
 	patientUseCase := usecase.NewPatientUseCase(patientRepository)
 
 	patientServiceServer := service.NewPatientServer(patientUseCase)

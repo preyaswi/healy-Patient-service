@@ -5,6 +5,7 @@ import (
 	"patient-service/pkg/models"
 	"patient-service/pkg/pb"
 	usecaseint "patient-service/pkg/usecase/interface"
+
 )
 
 type PatientServer struct {
@@ -31,12 +32,17 @@ func (p *PatientServer) PatientSignUp(ctx context.Context, patientsighupRequest 
 	if err != nil {
 		return &pb.PatientSignUpResponse{}, err
 	}
-	userDetails := &pb.PatientDetails{Id: uint64(data.Patient.Id), Fullname: data.Patient.Fullname, Email: data.Patient.Email, Gender: data.Patient.Gender, Contactnumber: data.Patient.Contactnumber}
+	userDetails := &pb.PatientDetails{
+		Id:            uint64(data.Patient.Id),
+		Fullname:      data.Patient.Fullname,
+		Email:         data.Patient.Email,
+		Gender:        data.Patient.Gender,
+		Contactnumber: data.Patient.Contactnumber}
 	return &pb.PatientSignUpResponse{
 		PatientDetails: userDetails,
 		AccessToken:    data.AccessToken,
 		RefreshToken:   data.RefreshToken,
-	}, nil
+	},nil
 }
 func (p *PatientServer) PatientLogin(ctx context.Context, PatientLoginRequest *pb.PatientLoginRequest) (*pb.PatientLoginResponse, error) {
 	patient := models.PatientLogin{
@@ -61,4 +67,17 @@ func (p *PatientServer) PatientLogin(ctx context.Context, PatientLoginRequest *p
 		RefreshToken:   data.RefreshToken,
 	}, nil
 
+}
+func (p *PatientServer)IndPatientDetails(ctx context.Context,req *pb.Idreq) (*pb.PatientDetails, error)  {
+	doctor,err:=p.patientUseCase.IndPatientDetails(req.UserId)
+	if err!=nil{
+		return &pb.PatientDetails{},err
+	}
+	return &pb.PatientDetails{
+		Id: uint64(doctor.Id),
+		Fullname: doctor.Fullname,
+		Email: doctor.Email,
+		Gender: doctor.Gender,
+		Contactnumber: doctor.Contactnumber,
+	},nil
 }

@@ -46,7 +46,9 @@ func (pr *patientUseCase) PatientsSignUp(patient models.PatientSignUp) (models.T
 		return models.TokenPatient{}, errors.New("error in hashing password")
 	}
 	patient.Password = hashPassword
+
 	PatientData, err := pr.patientRepository.PatientSignUp(patient)
+
 	if err != nil {
 		return models.TokenPatient{}, errors.New("could not add the user")
 	}
@@ -99,4 +101,11 @@ func (pr *patientUseCase)PatientLogin(patient models.PatientLogin)(models.TokenP
 			RefreshToken: refreshToken,
 		}, nil
 	
+}
+func (pr *patientUseCase)IndPatientDetails(patient_id uint64)(models.SignupdetailResponse,error)  {
+	pateint,err:=pr.patientRepository.IndPatientDetails(patient_id)
+	if err!=nil{
+		return models.SignupdetailResponse{},nil
+	}
+	return pateint,nil
 }

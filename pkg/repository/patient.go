@@ -62,3 +62,11 @@ func (ur *patientRepository)FindPatientByEmail(email string)(models.PatientDetai
 	}
 	return patientdetail, nil
 }
+func (ur *patientRepository)IndPatientDetails(patient_id uint64)(models.SignupdetailResponse,error)  {
+	var patient models.SignupdetailResponse
+	err:=ur.DB.Raw("Select * from patient where id=?",patient_id).Scan(&patient).Error
+	if err!=nil{
+		return models.SignupdetailResponse{},err
+	}
+	return patient,nil
+}

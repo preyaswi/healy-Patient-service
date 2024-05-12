@@ -10,4 +10,6 @@ type PatientRepository interface {
 	CheckPatientExistsByPhone(phone string) (*domain.Patient, error)
 	PatientSignUp(patient models.PatientSignUp) (models.SignupdetailResponse, error)
 	FindPatientByEmail(email string)(models.PatientDetails,error)
+	IndPatientDetails(patient_id uint64)(models.SignupdetailResponse,error)
+
 }

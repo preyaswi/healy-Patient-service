@@ -48,6 +48,7 @@ func GenerateAccessToken(user models.SignupdetailResponse) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return tokenString, nil
 }
 
