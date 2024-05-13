@@ -34,3 +34,14 @@ type PatientDetails struct {
 	Gender        string
 	Contactnumber string
 }
+type PatientProfile struct{
+	Fullname      string
+	Email         string
+	Gender        string
+	Contactnumber string
+}
+type UpdatePassword struct{
+	OldPassword        string `json:"old_password" binding:"required"`
+    NewPassword        string `json:"new_password" binding:"required"`
+    ConfirmNewPassword string `json:"confirm_new_password" binding:"required"`
+}

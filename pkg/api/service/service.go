@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"patient-service/pkg/models"
 	"patient-service/pkg/pb"
 	usecaseint "patient-service/pkg/usecase/interface"
-
 )
 
 type PatientServer struct {
@@ -80,4 +80,37 @@ func (p *PatientServer)IndPatientDetails(ctx context.Context,req *pb.Idreq) (*pb
 		Gender: doctor.Gender,
 		Contactnumber: doctor.Contactnumber,
 	},nil
+}
+func (p *PatientServer) UpdatePatientDetails(ctx context.Context,req *pb.UpdateRequest) (*pb.InPatientDetails, error){
+	patient:=models.SignupdetailResponse{
+		Id: uint(req.PatientId),
+		Fullname: req.InPatientDetails.Fullname,
+		Email: req.InPatientDetails.Email,
+		Gender: req.InPatientDetails.Gender,
+		Contactnumber: req.InPatientDetails.Contactnumber,
+	}
+	res,err:=p.patientUseCase.UpdatePatientDetails(patient)
+	if err!=nil{
+		return &pb.InPatientDetails{},err
+	}
+	return &pb.InPatientDetails{
+		Fullname: res.Fullname,
+		Email: res.Email,
+		Gender: res.Gender,
+		Contactnumber: res.Contactnumber,
+	},nil
+}
+func (p *PatientServer) UpdatePassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error) {
+	fmt.Println(req,"req",ctx,"ctx")
+	patient_id:=req.PatientId
+	body:=models.UpdatePassword{
+		OldPassword: req.OldPassword,
+		NewPassword: req.NewPassword,
+		ConfirmNewPassword: req.ConfirmNewPassword,
+	}
+	fmt.Println(body,"body")
+	if err:=p.patientUseCase.UpdatePassword(ctx,patient_id, body);err!=nil{
+		return &pb.UpdatePasswordResponse{},err
+	}
+	return&pb.UpdatePasswordResponse{},nil
 }
