@@ -133,30 +133,20 @@ func (pr *patientUseCase) UpdatePatientDetails(patient models.SignupdetailRespon
 			return models.PatientProfile{}, err
 		}
 	}
-
 	if patient.Fullname != "" {
 		if err := pr.patientRepository.UpdateName(patient.Fullname, patient.Id); err != nil {
 			return models.PatientProfile{}, err
 		}
 	}
-
 	if patient.Contactnumber != "" {
 		if err := pr.patientRepository.UpdatePatientPhone(patient.Contactnumber, patient.Id); err != nil {
 			return models.PatientProfile{}, err
 		}
 	}
-
 	return pr.patientRepository.UserDetails(int(patient.Id))
-
 }
 func (pr *patientUseCase) UpdatePassword(ctx context.Context,patient_id uint64, body models.UpdatePassword) error {
-	// var userID int
-	// var ok bool
-	// if userID, ok = ctx.Value("userID").(int); !ok {
-	// 	fmt.Println(userID,"useid")
-	// 	return errors.New("error retrieving user details")
-	// }
-	// fmt.Println("user id is", userID)
+
 	userPassword, err := pr.patientRepository.PatientPassword(int(patient_id))
 	if err != nil {
 		return err
@@ -176,4 +166,11 @@ func (pr *patientUseCase) UpdatePassword(ctx context.Context,patient_id uint64, 
 		return err
 	}
 	return nil
+}
+func (pr *patientUseCase)ListPatients() ([]models.SignupdetailResponse, error)  {
+	patients,err:=pr.patientRepository.ListPatients()
+	if err!=nil{
+		return []models.SignupdetailResponse{},err
+	}
+	return patients,nil
 }

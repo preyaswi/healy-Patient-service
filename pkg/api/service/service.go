@@ -101,7 +101,6 @@ func (p *PatientServer) UpdatePatientDetails(ctx context.Context,req *pb.UpdateR
 	},nil
 }
 func (p *PatientServer) UpdatePassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error) {
-	fmt.Println(req,"req",ctx,"ctx")
 	patient_id:=req.PatientId
 	body:=models.UpdatePassword{
 		OldPassword: req.OldPassword,
@@ -113,4 +112,24 @@ func (p *PatientServer) UpdatePassword(ctx context.Context, req *pb.UpdatePasswo
 		return &pb.UpdatePasswordResponse{},err
 	}
 	return&pb.UpdatePasswordResponse{},nil
+}
+func (p *PatientServer)ListPatients(ctx context.Context,req *pb.Req) (*pb.Listpares, error)  {
+	listed,err:=p.patientUseCase.ListPatients()
+	if err!=nil{
+		return &pb.Listpares{},err
+	}
+	patientlist:=make([]*pb.PatientDetails,len(listed))
+	for i,patient:=range listed{
+		patientlist[i]=&pb.PatientDetails{
+			Id: uint64(patient.Id),
+			Fullname: patient.Fullname,
+			Email: patient.Email,
+			Gender: patient.Gender,
+			Contactnumber: patient.Contactnumber,
+		}
+	}
+	return &pb.Listpares{
+		Pali: patientlist,
+	},nil
+
 }

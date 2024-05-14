@@ -31,7 +31,7 @@ func (ur *patientRepository) CheckPatientExistsByEmail(email string) (*domain.Pa
 	return &patient, nil
 }
 func (ur *patientRepository) CheckPatientExistsByPhone(phone string) (*domain.Patient, error) {
-	fmt.Println(phone,"contact number")
+	fmt.Println(phone, "contact number")
 	var patient domain.Patient
 	res := ur.DB.Where(&domain.Patient{Contactnumber: phone}).First(&patient)
 	if res.Error != nil {
@@ -56,7 +56,7 @@ func (ur *patientRepository) PatientSignUp(patient models.PatientSignUp) (models
 	}
 	return signupDetail, nil
 }
-func (ur *patientRepository)FindPatientByEmail(email string)(models.PatientDetails,error)  {
+func (ur *patientRepository) FindPatientByEmail(email string) (models.PatientDetails, error) {
 	var patientdetail models.PatientDetails
 	err := ur.DB.Raw("SELECT * FROM patient WHERE email=?", email).Scan(&patientdetail).Error
 	if err != nil {
@@ -64,13 +64,13 @@ func (ur *patientRepository)FindPatientByEmail(email string)(models.PatientDetai
 	}
 	return patientdetail, nil
 }
-func (ur *patientRepository)IndPatientDetails(patient_id uint64)(models.SignupdetailResponse,error)  {
+func (ur *patientRepository) IndPatientDetails(patient_id uint64) (models.SignupdetailResponse, error) {
 	var patient models.SignupdetailResponse
-	err:=ur.DB.Raw("Select * from patient where id=?",patient_id).Scan(&patient).Error
-	if err!=nil{
-		return models.SignupdetailResponse{},err
+	err := ur.DB.Raw("Select * from patient where id=?", patient_id).Scan(&patient).Error
+	if err != nil {
+		return models.SignupdetailResponse{}, err
 	}
-	return patient,nil
+	return patient, nil
 }
 func (ur *patientRepository) CheckPatientAvailability(email string) bool {
 
@@ -83,7 +83,7 @@ func (ur *patientRepository) CheckPatientAvailability(email string) bool {
 	return count > 0
 
 }
-func (ur *patientRepository)  UpdatePatientEmail(email string, PatientID uint) error {
+func (ur *patientRepository) UpdatePatientEmail(email string, PatientID uint) error {
 
 	err := ur.DB.Exec("update patient set email = ? where id = ?", email, PatientID).Error
 	if err != nil {
@@ -103,7 +103,7 @@ func (ur *patientRepository) UpdatePatientPhone(phone string, PatientID uint) er
 
 }
 
-func(ur *patientRepository) UpdateName(name string, PatientID uint) error {
+func (ur *patientRepository) UpdateName(name string, PatientID uint) error {
 
 	err := ur.DB.Exec("update patient set fullname = ? where id = ?", name, PatientID).Error
 	if err != nil {
@@ -138,4 +138,23 @@ func (ur *patientRepository) UpdatePatientPassword(password string, userID int) 
 	}
 	fmt.Println("password Updated succesfully")
 	return nil
+}
+func (ur *patientRepository) ListPatients() ([]models.SignupdetailResponse, error) {
+	row, err := ur.DB.Raw("select id,fullname,email,gender,contactnumber from patient").Rows()
+	if err != nil {
+		return []models.SignupdetailResponse{}, err
+	}
+	defer row.Close()
+	var patientDetails []models.SignupdetailResponse
+	for row.Next() {
+		var patientdetail models.SignupdetailResponse
+
+		// Scan the row into variables
+		if err := row.Scan(&patientdetail.Id, &patientdetail.Fullname, &patientdetail.Email,&patientdetail.Gender, &patientdetail.Contactnumber); err != nil {
+			return nil, err
+		}
+
+		patientDetails = append(patientDetails, patientdetail)
+	}
+	return patientDetails, nil
 }

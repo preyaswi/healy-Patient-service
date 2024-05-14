@@ -8,6 +8,7 @@ service Patient{
     rpc IndPatientDetails(idreq)returns(PatientDetails){};
 	rpc UpdatePatientDetails(UpdateRequest)returns(InPatientDetails){};
 	rpc UpdatePassword(UpdatePasswordRequest)returns(UpdatePasswordResponse){};
+	rpc ListPatients(req)returns(listpares){};
 
 }
 message PatientSignUpRequest{
@@ -59,3 +60,7 @@ message UpdatePasswordRequest {
     string confirm_new_password = 4;
 }
 message UpdatePasswordResponse{}
+message req{}
+message listpares{
+	repeated PatientDetails pali=1;
+}

@@ -18,4 +18,5 @@ type PatientRepository interface {
 	UserDetails(userID int) (models.PatientProfile, error)
 	PatientPassword(userID int) (string, error)
 	UpdatePatientPassword(password string, userID int) error
+	ListPatients()([]models.SignupdetailResponse,error)
 }
