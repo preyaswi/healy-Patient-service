@@ -145,7 +145,7 @@ func (pr *patientUseCase) UpdatePatientDetails(patient models.SignupdetailRespon
 	}
 	return pr.patientRepository.UserDetails(int(patient.Id))
 }
-func (pr *patientUseCase) UpdatePassword(ctx context.Context,patient_id uint64, body models.UpdatePassword) error {
+func (pr *patientUseCase) UpdatePassword(ctx context.Context, patient_id uint64, body models.UpdatePassword) error {
 
 	userPassword, err := pr.patientRepository.PatientPassword(int(patient_id))
 	if err != nil {
@@ -167,10 +167,10 @@ func (pr *patientUseCase) UpdatePassword(ctx context.Context,patient_id uint64, 
 	}
 	return nil
 }
-func (pr *patientUseCase)ListPatients() ([]models.SignupdetailResponse, error)  {
-	patients,err:=pr.patientRepository.ListPatients()
-	if err!=nil{
-		return []models.SignupdetailResponse{},err
+func (pr *patientUseCase) ListPatients() ([]models.SignupdetailResponse, error) {
+	patients, err := pr.patientRepository.ListPatients()
+	if err != nil {
+		return []models.SignupdetailResponse{}, err
 	}
-	return patients,nil
+	return patients, nil
 }

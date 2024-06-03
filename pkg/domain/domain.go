@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type Patient struct {
 	Id            uint   `json:"id" gorm:"uniquekey; not null"`
 	Fullname      string `json:"fullname" gorm:"validate:required"`
@@ -10,4 +12,14 @@ type Patient struct {
 }
 func (Patient) TableName() string {
     return "patient"
+}
+type Prescription struct {
+	ID         uint      `json:"id" gorm:"primaryKey"`
+	PatientID  uint      `json:"patient_id" gorm:"not null"`
+	DoctorID   uint      `json:"doctor_id" gorm:"not null"`
+	DoctorName string    `json:"doctor_name" gorm:"not null"`
+	Medicine   string    `json:"medicine" gorm:"not null"`
+	Dosage     string    `json:"dosage" gorm:"not null"`
+	Notes      string    `json:"notes"`
+	CreatedAt  time.Time `json:"created_at"`
 }
