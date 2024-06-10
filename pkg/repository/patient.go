@@ -19,6 +19,30 @@ func NewPatientRepository(DB *gorm.DB) interfaces.PatientRepository {
 		DB: DB,
 	}
 }
+
+func (ur *patientRepository) FindOrCreatePatientByGoogleID(googleID, email, name string) (models.GoogleSignupdetailResponse, error){
+	var patient domain.Patient
+    if err := ur.DB.Where(&domain.Patient{GoogleId: googleID}).First(&patient).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            // Create new patient
+            patient = domain.Patient{
+                GoogleId: googleID,
+                Email:    email,
+                Fullname: name,
+            }
+            ur.DB.Create(&patient)
+        } else {
+            return models.GoogleSignupdetailResponse{}, err
+        }
+    }
+    return models.GoogleSignupdetailResponse{
+        Id:       uint(patient.Id),
+        Email:    patient.Email,
+        FullName: patient.Fullname,
+        GoogleId: patient.GoogleId,
+    }, nil
+}
+
 func (ur *patientRepository) CheckPatientExistsByEmail(email string) (*domain.Patient, error) {
 	var patient domain.Patient
 	res := ur.DB.Where(&domain.Patient{Email: email}).First(&patient)
@@ -31,7 +55,6 @@ func (ur *patientRepository) CheckPatientExistsByEmail(email string) (*domain.Pa
 	return &patient, nil
 }
 func (ur *patientRepository) CheckPatientExistsByPhone(phone string) (*domain.Patient, error) {
-	fmt.Println(phone, "contact number")
 	var patient domain.Patient
 	res := ur.DB.Where(&domain.Patient{Contactnumber: phone}).First(&patient)
 	if res.Error != nil {
@@ -41,20 +64,6 @@ func (ur *patientRepository) CheckPatientExistsByPhone(phone string) (*domain.Pa
 		return &domain.Patient{}, res.Error
 	}
 	return &patient, nil
-}
-func (ur *patientRepository) PatientSignUp(patient models.PatientSignUp) (models.SignupdetailResponse, error) {
-	var signupDetail models.SignupdetailResponse
-	err := ur.DB.Raw(`
-		INSERT INTO Patient(fullname,email,password,gender,contactnumber)
-		VALUES(?, ?, ?, ?, ?)
-		RETURNING id,fullname,email,gender,contactnumber
-	`, patient.Fullname, patient.Email, patient.Password, patient.Gender, patient.Contactnumber).
-		Scan(&signupDetail).Error
-
-	if err != nil {
-		return models.SignupdetailResponse{}, err
-	}
-	return signupDetail, nil
 }
 func (ur *patientRepository) FindPatientByEmail(email string) (models.PatientDetails, error) {
 	var patientdetail models.PatientDetails
@@ -66,7 +75,7 @@ func (ur *patientRepository) FindPatientByEmail(email string) (models.PatientDet
 }
 func (ur *patientRepository) IndPatientDetails(patient_id uint64) (models.SignupdetailResponse, error) {
 	var patient models.SignupdetailResponse
-	err := ur.DB.Raw("Select * from patient where id=?", patient_id).Scan(&patient).Error
+	err := ur.DB.Raw("Select * from patients where id=?", patient_id).Scan(&patient).Error
 	if err != nil {
 		return models.SignupdetailResponse{}, err
 	}

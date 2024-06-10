@@ -8,6 +8,12 @@ type PatientSignUp struct {
 	Gender          string
 	Contactnumber   string
 }
+type GoogleSignupdetailResponse struct {
+	Id       uint
+	GoogleId string
+	FullName string
+	Email    string
+}
 type SignupdetailResponse struct {
 	Id            uint   `json:"id"`
 	Fullname      string `json:"fullname"`
@@ -17,7 +23,7 @@ type SignupdetailResponse struct {
 }
 
 type TokenPatient struct {
-	Patient      SignupdetailResponse
+	Patient      GoogleSignupdetailResponse
 	AccessToken  string
 	RefreshToken string
 }
@@ -39,9 +45,4 @@ type PatientProfile struct{
 	Email         string
 	Gender        string
 	Contactnumber string
-}
-type UpdatePassword struct{
-	OldPassword        string `json:"old_password" binding:"required"`
-    NewPassword        string `json:"new_password" binding:"required"`
-    ConfirmNewPassword string `json:"confirm_new_password" binding:"required"`
 }

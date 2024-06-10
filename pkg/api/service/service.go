@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"patient-service/pkg/models"
 	"patient-service/pkg/pb"
 	usecaseint "patient-service/pkg/usecase/interface"
@@ -19,54 +18,24 @@ func NewPatientServer(useCase usecaseint.PatientUseCase) pb.PatientServer {
 	}
 
 }
-func (p *PatientServer) PatientSignUp(ctx context.Context, patientsighupRequest *pb.PatientSignUpRequest) (*pb.PatientSignUpResponse, error) {
-	patientCreateDetails := models.PatientSignUp{
-		Fullname:        patientsighupRequest.Fullname,
-		Email:           patientsighupRequest.Email,
-		Password:        patientsighupRequest.Password,
-		Confirmpassword: patientsighupRequest.Confirmpassword,
-		Gender:          patientsighupRequest.Gender,
-		Contactnumber:   patientsighupRequest.Contactnumber,
+func (p *PatientServer)GoogleSignIn(ctx context.Context,req *pb.GoogleSignInRequest) (*pb.PatientSignUpResponse, error)  {
+
+	res,err:=p.patientUseCase.GoogleSignIn(
+		req.GoogleId,req.Name,req.Email,
+	)
+	if err!=nil{
+		return &pb.PatientSignUpResponse{},err
 	}
-	data, err := p.patientUseCase.PatientsSignUp(patientCreateDetails)
-	if err != nil {
-		return &pb.PatientSignUpResponse{}, err
-	}
-	userDetails := &pb.PatientDetails{
-		Id:            uint64(data.Patient.Id),
-		Fullname:      data.Patient.Fullname,
-		Email:         data.Patient.Email,
-		Gender:        data.Patient.Gender,
-		Contactnumber: data.Patient.Contactnumber}
 	return &pb.PatientSignUpResponse{
-		PatientDetails: userDetails,
-		AccessToken:    data.AccessToken,
-		RefreshToken:   data.RefreshToken,
+		PatientDetails: &pb.GoogleSignInResponse{
+			Id: uint32(res.Patient.Id),
+			GoogleId: res.Patient.GoogleId,
+			Fullname: res.Patient.FullName,
+			Email: res.Patient.Email,
+		},
+		AccessToken: res.AccessToken,
+		RefreshToken: res.RefreshToken,
 	},nil
-}
-func (p *PatientServer) PatientLogin(ctx context.Context, PatientLoginRequest *pb.PatientLoginRequest) (*pb.PatientLoginResponse, error) {
-	patient := models.PatientLogin{
-		Email:    PatientLoginRequest.Email,
-		Password: PatientLoginRequest.Password,
-	}
-	data, err := p.patientUseCase.PatientLogin(patient)
-
-	if err != nil {
-		return &pb.PatientLoginResponse{}, err
-	}
-	patientdetail := &pb.PatientDetails{
-		Id:            uint64(data.Patient.Id),
-		Fullname:      data.Patient.Fullname,
-		Email:         patient.Email,
-		Gender:        data.Patient.Gender,
-		Contactnumber: data.Patient.Contactnumber,
-	}
-	return &pb.PatientLoginResponse{
-		PatientDetails: patientdetail,
-		AccessToken:    data.AccessToken,
-		RefreshToken:   data.RefreshToken,
-	}, nil
-
 }
 func (p *PatientServer)IndPatientDetails(ctx context.Context,req *pb.Idreq) (*pb.PatientDetails, error)  {
 	doctor,err:=p.patientUseCase.IndPatientDetails(req.UserId)
@@ -100,19 +69,7 @@ func (p *PatientServer) UpdatePatientDetails(ctx context.Context,req *pb.UpdateR
 		Contactnumber: res.Contactnumber,
 	},nil
 }
-func (p *PatientServer) UpdatePassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error) {
-	patient_id:=req.PatientId
-	body:=models.UpdatePassword{
-		OldPassword: req.OldPassword,
-		NewPassword: req.NewPassword,
-		ConfirmNewPassword: req.ConfirmNewPassword,
-	}
-	fmt.Println(body,"body")
-	if err:=p.patientUseCase.UpdatePassword(ctx,patient_id, body);err!=nil{
-		return &pb.UpdatePasswordResponse{},err
-	}
-	return&pb.UpdatePasswordResponse{},nil
-}
+
 func (p *PatientServer)ListPatients(ctx context.Context,req *pb.Req) (*pb.Listpares, error)  {
 	listed,err:=p.patientUseCase.ListPatients()
 	if err!=nil{

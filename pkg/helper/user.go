@@ -42,7 +42,7 @@ func GenerateTokenUsers(userID int, userEmail string, expirationTime time.Time) 
 	return tokenString, nil
 }
 
-func GenerateAccessToken(user models.SignupdetailResponse) (string, error) {
+func GenerateAccessToken(user models.GoogleSignupdetailResponse) (string, error) {
 	expirationTime := time.Now().Add(15 * time.Minute)
 	tokenString, err := GenerateTokenUsers(int(user.Id), user.Email, expirationTime)
 	if err != nil {
@@ -52,7 +52,7 @@ func GenerateAccessToken(user models.SignupdetailResponse) (string, error) {
 	return tokenString, nil
 }
 
-func GenerateRefreshToken(user models.SignupdetailResponse) (string, error) {
+func GenerateRefreshToken(user models.GoogleSignupdetailResponse) (string, error) {
 	expirationTime := time.Now().Add(24 * 90 * time.Hour)
 	tokenString, err := GenerateTokenUsers(int(user.Id), user.Email, expirationTime)
 	if err != nil {

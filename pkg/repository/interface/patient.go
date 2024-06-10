@@ -6,9 +6,9 @@ import (
 )
 
 type PatientRepository interface {
+	FindOrCreatePatientByGoogleID(googleID, email, name string) (models.GoogleSignupdetailResponse, error)
 	CheckPatientExistsByEmail(email string) (*domain.Patient, error)
 	CheckPatientExistsByPhone(phone string) (*domain.Patient, error)
-	PatientSignUp(patient models.PatientSignUp) (models.SignupdetailResponse, error)
 	FindPatientByEmail(email string)(models.PatientDetails,error)
 	IndPatientDetails(patient_id uint64)(models.SignupdetailResponse,error)
 	CheckPatientAvailability(email string) bool 
