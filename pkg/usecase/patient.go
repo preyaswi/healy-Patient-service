@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"patient-service/pkg/helper"
 	"patient-service/pkg/models"
 	interfaces "patient-service/pkg/repository/interface"
 	usecaseint "patient-service/pkg/usecase/interface"
-
 )
 
 type patientUseCase struct {
@@ -19,27 +19,27 @@ func NewPatientUseCase(repository interfaces.PatientRepository) usecaseint.Patie
 	}
 }
 
-func (pr *patientUseCase) GoogleSignIn(googleid,googlename,googleEmail string) (models.TokenPatient, error)  {
-	patient,err:=pr.patientRepository.FindOrCreatePatientByGoogleID(googleid,googleEmail,googlename)
-	if err!=nil{
-		return models.TokenPatient{},err
+func (pr *patientUseCase) GoogleSignIn(googleid, googlename, googleEmail string) (models.TokenPatient, error) {
+	patient, err := pr.patientRepository.FindOrCreatePatientByGoogleID(googleid, googleEmail, googlename)
+	if err != nil {
+		return models.TokenPatient{}, err
 	}
-	accesstoken,err:=helper.GenerateAccessToken(patient)
-	if err!=nil{
-		return models.TokenPatient{},err
+	accesstoken, err := helper.GenerateAccessToken(patient)
+	if err != nil {
+		return models.TokenPatient{}, err
 	}
-	refreshToken,err:=helper.GenerateRefreshToken(patient)
-	if err!=nil{
-		return models.TokenPatient{},err
+	refreshToken, err := helper.GenerateRefreshToken(patient)
+	if err != nil {
+		return models.TokenPatient{}, err
 	}
 	return models.TokenPatient{
-		Patient: patient,
-		AccessToken: accesstoken,
+		Patient:      patient,
+		AccessToken:  accesstoken,
 		RefreshToken: refreshToken,
-	},nil
+	}, nil
 
 }
-func (pr *patientUseCase) IndPatientDetails(patient_id uint64) (models.SignupdetailResponse, error) {
+func (pr *patientUseCase) IndPatientDetails(patient_id string) (models.SignupdetailResponse, error) {
 	pateint, err := pr.patientRepository.IndPatientDetails(patient_id)
 	if err != nil {
 		return models.SignupdetailResponse{}, nil
@@ -47,41 +47,49 @@ func (pr *patientUseCase) IndPatientDetails(patient_id uint64) (models.Signupdet
 	return pateint, nil
 }
 func (pr *patientUseCase) UpdatePatientDetails(patient models.SignupdetailResponse) (models.PatientProfile, error) {
-	userExist := pr.patientRepository.CheckPatientAvailability(patient.Email)
-	// update with email that does not already exist
-	if userExist {
-		return models.PatientProfile{}, errors.New("user already exist, choose different email")
-	}
-	if patient.Contactnumber != "" {
+    fmt.Println(patient.Email, "email")
 
-		userExistByPhone, err := pr.patientRepository.CheckPatientExistsByPhone(patient.Contactnumber)
+    // Update email if provided and not already existing
+    if patient.Email != "" {
+        userExist := pr.patientRepository.CheckPatientAvailability(patient.Email)
+        if userExist {
+            return models.PatientProfile{}, errors.New("user already exists, choose a different email")
+        }
+        if err := pr.patientRepository.UpdatePatientEmail(patient.Email, patient.Id); err != nil {
+            return models.PatientProfile{}, err
+        }
+    }
 
-		if err != nil {
-			return models.PatientProfile{}, errors.New("error with server")
-		}
-		if userExistByPhone != nil {
-			return models.PatientProfile{}, errors.New("user with this phone is already exists")
-		}
-	}
-	// which all field are not empty (which are provided from the front end should be updated)
-	if patient.Email != "" {
-		if err := pr.patientRepository.UpdatePatientEmail(patient.Email, patient.Id); err != nil {
-			return models.PatientProfile{}, err
-		}
-	}
-	if patient.Fullname != "" {
-		if err := pr.patientRepository.UpdateName(patient.Fullname, patient.Id); err != nil {
-			return models.PatientProfile{}, err
-		}
-	}
-	if patient.Contactnumber != "" {
-		if err := pr.patientRepository.UpdatePatientPhone(patient.Contactnumber, patient.Id); err != nil {
-			return models.PatientProfile{}, err
-		}
-	}
-	return pr.patientRepository.UserDetails(int(patient.Id))
+    // Update contact number if provided and not already existing
+    if patient.Contactnumber != "" {
+        userExistByPhone, err := pr.patientRepository.CheckPatientExistsByPhone(patient.Contactnumber)
+        fmt.Println(userExistByPhone, "userExistByPhone")
+        if err != nil {
+            return models.PatientProfile{}, errors.New("error with server")
+        }
+        if userExistByPhone != nil {
+            return models.PatientProfile{}, errors.New("user with this phone number already exists")
+        }
+        if err := pr.patientRepository.UpdatePatientPhone(patient.Contactnumber, patient.Id); err != nil {
+            return models.PatientProfile{}, err
+        }
+    }
+
+    // Update name if provided
+    if patient.Fullname != "" {
+        if err := pr.patientRepository.UpdateName(patient.Fullname, patient.Id); err != nil {
+            return models.PatientProfile{}, err
+        }
+    }
+
+    // Retrieve and return updated user details
+    updatedPatient, err := pr.patientRepository.UserDetails(patient.Id)
+    if err != nil {
+        return models.PatientProfile{}, errors.New("could not get user details")
+    }
+
+    return updatedPatient, nil
 }
-
 func (pr *patientUseCase) ListPatients() ([]models.SignupdetailResponse, error) {
 	patients, err := pr.patientRepository.ListPatients()
 	if err != nil {

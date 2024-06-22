@@ -28,7 +28,7 @@ func (p *PatientServer)GoogleSignIn(ctx context.Context,req *pb.GoogleSignInRequ
 	}
 	return &pb.PatientSignUpResponse{
 		PatientDetails: &pb.GoogleSignInResponse{
-			Id: uint32(res.Patient.Id),
+			Id: res.Patient.Id,
 			GoogleId: res.Patient.GoogleId,
 			Fullname: res.Patient.FullName,
 			Email: res.Patient.Email,
@@ -43,7 +43,7 @@ func (p *PatientServer)IndPatientDetails(ctx context.Context,req *pb.Idreq) (*pb
 		return &pb.PatientDetails{},err
 	}
 	return &pb.PatientDetails{
-		Id: uint64(doctor.Id),
+		Id: doctor.Id,
 		Fullname: doctor.Fullname,
 		Email: doctor.Email,
 		Gender: doctor.Gender,
@@ -52,7 +52,7 @@ func (p *PatientServer)IndPatientDetails(ctx context.Context,req *pb.Idreq) (*pb
 }
 func (p *PatientServer) UpdatePatientDetails(ctx context.Context,req *pb.UpdateRequest) (*pb.InPatientDetails, error){
 	patient:=models.SignupdetailResponse{
-		Id: uint(req.PatientId),
+		Id:req.PatientId,
 		Fullname: req.InPatientDetails.Fullname,
 		Email: req.InPatientDetails.Email,
 		Gender: req.InPatientDetails.Gender,
@@ -78,7 +78,7 @@ func (p *PatientServer)ListPatients(ctx context.Context,req *pb.Req) (*pb.Listpa
 	patientlist:=make([]*pb.PatientDetails,len(listed))
 	for i,patient:=range listed{
 		patientlist[i]=&pb.PatientDetails{
-			Id: uint64(patient.Id),
+			Id: patient.Id,
 			Fullname: patient.Fullname,
 			Email: patient.Email,
 			Gender: patient.Gender,

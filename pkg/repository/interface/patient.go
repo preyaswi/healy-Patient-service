@@ -10,13 +10,11 @@ type PatientRepository interface {
 	CheckPatientExistsByEmail(email string) (*domain.Patient, error)
 	CheckPatientExistsByPhone(phone string) (*domain.Patient, error)
 	FindPatientByEmail(email string)(models.PatientDetails,error)
-	IndPatientDetails(patient_id uint64)(models.SignupdetailResponse,error)
+	IndPatientDetails(patient_id string)(models.SignupdetailResponse,error)
 	CheckPatientAvailability(email string) bool 
-	UpdatePatientEmail(email string, PatientID uint) error
-	UpdatePatientPhone(phone string, PatientID uint) error
-	UpdateName(name string, PatientID uint) error
-	UserDetails(userID int) (models.PatientProfile, error)
-	PatientPassword(userID int) (string, error)
-	UpdatePatientPassword(password string, userID int) error
+	UpdatePatientEmail(email string, PatientID string) error
+	UpdatePatientPhone(phone string, PatientID string) error
+	UpdateName(name string, PatientID string) error
+	UserDetails(userID string) (models.PatientProfile, error)
 	ListPatients()([]models.SignupdetailResponse,error)
 }

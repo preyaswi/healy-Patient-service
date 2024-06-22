@@ -1,12 +1,14 @@
 package repository
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"patient-service/pkg/domain"
 	"patient-service/pkg/models"
 	interfaces "patient-service/pkg/repository/interface"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -19,28 +21,36 @@ func NewPatientRepository(DB *gorm.DB) interfaces.PatientRepository {
 		DB: DB,
 	}
 }
-
-func (ur *patientRepository) FindOrCreatePatientByGoogleID(googleID, email, name string) (models.GoogleSignupdetailResponse, error){
+func generateShortUUID() string {
+	uuid := uuid.New()
+	return base64.RawURLEncoding.EncodeToString(uuid[:])
+}
+func (ur *patientRepository) FindOrCreatePatientByGoogleID(googleID, email, name string) (models.GoogleSignupdetailResponse, error) {
 	var patient domain.Patient
-    if err := ur.DB.Where(&domain.Patient{GoogleId: googleID}).First(&patient).Error; err != nil {
-        if errors.Is(err, gorm.ErrRecordNotFound) {
-            // Create new patient
-            patient = domain.Patient{
-                GoogleId: googleID,
-                Email:    email,
-                Fullname: name,
-            }
-            ur.DB.Create(&patient)
-        } else {
-            return models.GoogleSignupdetailResponse{}, err
-        }
-    }
-    return models.GoogleSignupdetailResponse{
-        Id:       uint(patient.Id),
-        Email:    patient.Email,
-        FullName: patient.Fullname,
-        GoogleId: patient.GoogleId,
-    }, nil
+	if err := ur.DB.Where(&domain.Patient{GoogleId: googleID}).First(&patient).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Create new patient with UUID
+			patient = domain.Patient{
+				ID:       generateShortUUID(),
+				GoogleId: googleID,
+				Email:    email,
+				Fullname: name,
+			}
+
+			if err := ur.DB.Create(&patient).Error; err != nil {
+				return models.GoogleSignupdetailResponse{}, err
+			}
+		} else {
+			return models.GoogleSignupdetailResponse{}, err
+		}
+	}
+
+	return models.GoogleSignupdetailResponse{
+		Id:       patient.ID,
+		Email:    patient.Email,
+		FullName: patient.Fullname,
+		GoogleId: patient.GoogleId,
+	}, nil
 }
 
 func (ur *patientRepository) CheckPatientExistsByEmail(email string) (*domain.Patient, error) {
@@ -73,14 +83,19 @@ func (ur *patientRepository) FindPatientByEmail(email string) (models.PatientDet
 	}
 	return patientdetail, nil
 }
-func (ur *patientRepository) IndPatientDetails(patient_id uint64) (models.SignupdetailResponse, error) {
+func (ur *patientRepository) IndPatientDetails(patient_id string) (models.SignupdetailResponse, error) {
 	var patient models.SignupdetailResponse
-	err := ur.DB.Raw("Select * from patients where id=?", patient_id).Scan(&patient).Error
-	if err != nil {
-		return models.SignupdetailResponse{}, err
+	res := ur.DB.Table("patients").Where("id = ?", patient_id).First(&patient)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return models.SignupdetailResponse{}, errors.New("patient with this id does not exist")
+		}
+		return models.SignupdetailResponse{}, res.Error
 	}
+
 	return patient, nil
 }
+
 func (ur *patientRepository) CheckPatientAvailability(email string) bool {
 
 	var count int
@@ -92,7 +107,7 @@ func (ur *patientRepository) CheckPatientAvailability(email string) bool {
 	return count > 0
 
 }
-func (ur *patientRepository) UpdatePatientEmail(email string, PatientID uint) error {
+func (ur *patientRepository) UpdatePatientEmail(email string, PatientID string) error {
 
 	err := ur.DB.Exec("update patient set email = ? where id = ?", email, PatientID).Error
 	if err != nil {
@@ -102,9 +117,9 @@ func (ur *patientRepository) UpdatePatientEmail(email string, PatientID uint) er
 
 }
 
-func (ur *patientRepository) UpdatePatientPhone(phone string, PatientID uint) error {
+func (ur *patientRepository) UpdatePatientPhone(phone string, PatientID string) error {
 
-	err := ur.DB.Exec("update patient set contactnumber = ? where id = ?", phone, PatientID).Error
+	err := ur.DB.Exec("update patients set contactnumber = ? where id = ?", phone, PatientID).Error
 	if err != nil {
 		return err
 	}
@@ -112,7 +127,7 @@ func (ur *patientRepository) UpdatePatientPhone(phone string, PatientID uint) er
 
 }
 
-func (ur *patientRepository) UpdateName(name string, PatientID uint) error {
+func (ur *patientRepository) UpdateName(name string, PatientID string) error {
 
 	err := ur.DB.Exec("update patient set fullname = ? where id = ?", name, PatientID).Error
 	if err != nil {
@@ -121,7 +136,7 @@ func (ur *patientRepository) UpdateName(name string, PatientID uint) error {
 	return nil
 
 }
-func (ur *patientRepository) UserDetails(userID int) (models.PatientProfile, error) {
+func (ur *patientRepository) UserDetails(userID string) (models.PatientProfile, error) {
 
 	var userDetails models.PatientProfile
 	err := ur.DB.Raw("select patient.fullname,patient.email,patient.gender,patient.contactnumber from patient  where patient.id = ?", userID).Row().Scan(&userDetails.Fullname, &userDetails.Email, &userDetails.Gender, &userDetails.Contactnumber)
@@ -130,26 +145,9 @@ func (ur *patientRepository) UserDetails(userID int) (models.PatientProfile, err
 	}
 	return userDetails, nil
 }
-func (ur *patientRepository) PatientPassword(userID int) (string, error) {
 
-	var userPassword string
-	err := ur.DB.Raw("select password from patient where id = ?", userID).Scan(&userPassword).Error
-	if err != nil {
-		return "", err
-	}
-	return userPassword, nil
-
-}
-func (ur *patientRepository) UpdatePatientPassword(password string, userID int) error {
-	err := ur.DB.Exec("update patient set password = ? where id = ?", password, userID).Error
-	if err != nil {
-		return err
-	}
-	fmt.Println("password Updated succesfully")
-	return nil
-}
 func (ur *patientRepository) ListPatients() ([]models.SignupdetailResponse, error) {
-	row, err := ur.DB.Raw("select id,fullname,email,gender,contactnumber from patient").Rows()
+	row, err := ur.DB.Raw("select id,fullname,email,gender,contactnumber from patients").Rows()
 	if err != nil {
 		return []models.SignupdetailResponse{}, err
 	}
@@ -159,7 +157,7 @@ func (ur *patientRepository) ListPatients() ([]models.SignupdetailResponse, erro
 		var patientdetail models.SignupdetailResponse
 
 		// Scan the row into variables
-		if err := row.Scan(&patientdetail.Id, &patientdetail.Fullname, &patientdetail.Email,&patientdetail.Gender, &patientdetail.Contactnumber); err != nil {
+		if err := row.Scan(&patientdetail.Id, &patientdetail.Fullname, &patientdetail.Email, &patientdetail.Gender, &patientdetail.Contactnumber); err != nil {
 			return nil, err
 		}
 

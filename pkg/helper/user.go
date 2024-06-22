@@ -10,7 +10,7 @@ import (
 )
 
 type AuthUserClaims struct {
-	Id    int    `json:"id"`
+	Id    string    `json:"id"`
 	Email string `json:"email"`
 	Role  string `json:"role"`
 	jwt.StandardClaims
@@ -25,7 +25,7 @@ func PasswordHash(password string) (string, error) {
 	return hash, nil
 }
 
-func GenerateTokenUsers(userID int, userEmail string, expirationTime time.Time) (string, error) {
+func GenerateTokenUsers(userID string, userEmail string, expirationTime time.Time) (string, error) {
 	claims := &AuthUserClaims{
 		Id:    userID,
 		Email: userEmail,
@@ -44,7 +44,7 @@ func GenerateTokenUsers(userID int, userEmail string, expirationTime time.Time) 
 
 func GenerateAccessToken(user models.GoogleSignupdetailResponse) (string, error) {
 	expirationTime := time.Now().Add(15 * time.Minute)
-	tokenString, err := GenerateTokenUsers(int(user.Id), user.Email, expirationTime)
+	tokenString, err := GenerateTokenUsers(user.Id, user.Email, expirationTime)
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +54,7 @@ func GenerateAccessToken(user models.GoogleSignupdetailResponse) (string, error)
 
 func GenerateRefreshToken(user models.GoogleSignupdetailResponse) (string, error) {
 	expirationTime := time.Now().Add(24 * 90 * time.Hour)
-	tokenString, err := GenerateTokenUsers(int(user.Id), user.Email, expirationTime)
+	tokenString, err := GenerateTokenUsers(user.Id, user.Email, expirationTime)
 	if err != nil {
 		return "", err
 	}

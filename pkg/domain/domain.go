@@ -2,14 +2,11 @@ package domain
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Patient struct {
-	gorm.Model
-	Id            uint   `json:"id" gorm:"uniquekey; not null"`
-	GoogleId string  `json:"googleid" gorm:"uniquekey; not null"`
+	ID            string `gorm:"primary_key"`
+	GoogleId      string `json:"googleid" gorm:"unique;not null"`
 	Fullname      string `json:"fullname" gorm:"validate:required"`
 	Email         string `json:"email" gorm:"validate:required"`
 	Password      string `json:"password" gorm:"validate:required"`

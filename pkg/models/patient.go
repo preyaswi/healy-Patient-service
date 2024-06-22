@@ -9,13 +9,13 @@ type PatientSignUp struct {
 	Contactnumber   string
 }
 type GoogleSignupdetailResponse struct {
-	Id       uint
-	GoogleId string
-	FullName string
-	Email    string
+	Id       string
+    GoogleId string
+    FullName string
+    Email    string
 }
 type SignupdetailResponse struct {
-	Id            uint   `json:"id"`
+	Id            string   `json:"id"`
 	Fullname      string `json:"fullname"`
 	Email         string `json:"email"`
 	Gender        string `json:"gender"`
