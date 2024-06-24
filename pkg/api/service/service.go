@@ -21,7 +21,7 @@ func NewPatientServer(useCase usecaseint.PatientUseCase) pb.PatientServer {
 func (p *PatientServer)GoogleSignIn(ctx context.Context,req *pb.GoogleSignInRequest) (*pb.PatientSignUpResponse, error)  {
 
 	res,err:=p.patientUseCase.GoogleSignIn(
-		req.GoogleId,req.Name,req.Email,
+		req.GoogleId,req.Name,req.Email,req.AccessToken,req.RefreshToken,req.Tokenexpiry,
 	)
 	if err!=nil{
 		return &pb.PatientSignUpResponse{},err

@@ -25,18 +25,20 @@ func generateShortUUID() string {
 	uuid := uuid.New()
 	return base64.RawURLEncoding.EncodeToString(uuid[:])
 }
-func (ur *patientRepository) FindOrCreatePatientByGoogleID(googleID, email, name string) (models.GoogleSignupdetailResponse, error) {
+func (ur *patientRepository) FindOrCreatePatientByGoogleID(googleID, email, name, accesstoken, refreshtoken, tokenexpiry string) (models.GoogleSignupdetailResponse, error) {
 	var patient domain.Patient
 	if err := ur.DB.Where(&domain.Patient{GoogleId: googleID}).First(&patient).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Create new patient with UUID
 			patient = domain.Patient{
-				ID:       generateShortUUID(),
-				GoogleId: googleID,
-				Email:    email,
-				Fullname: name,
+				ID:           generateShortUUID(),
+				GoogleId:     googleID,
+				Email:        email,
+				Fullname:     name,
+				AccessToken:  accesstoken,
+				RefreshToken: refreshtoken,
+				TokenExpiry:  tokenexpiry,
 			}
-
 			if err := ur.DB.Create(&patient).Error; err != nil {
 				return models.GoogleSignupdetailResponse{}, err
 			}

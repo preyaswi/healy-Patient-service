@@ -19,8 +19,8 @@ func NewPatientUseCase(repository interfaces.PatientRepository) usecaseint.Patie
 	}
 }
 
-func (pr *patientUseCase) GoogleSignIn(googleid, googlename, googleEmail string) (models.TokenPatient, error) {
-	patient, err := pr.patientRepository.FindOrCreatePatientByGoogleID(googleid, googleEmail, googlename)
+func (pr *patientUseCase) GoogleSignIn(googleid, googlename, googleEmail,googleaccesstoken,googlerefreshtoken,googletokenexpiry   string) (models.TokenPatient, error) {
+	patient, err := pr.patientRepository.FindOrCreatePatientByGoogleID(googleid, googleEmail, googlename,googleaccesstoken,googlerefreshtoken,googletokenexpiry)
 	if err != nil {
 		return models.TokenPatient{}, err
 	}

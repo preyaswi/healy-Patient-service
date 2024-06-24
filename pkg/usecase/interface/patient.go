@@ -5,7 +5,7 @@ import (
 )
 
 type PatientUseCase interface {
-	GoogleSignIn(googleid,googlename,googleEmail string) (models.TokenPatient, error) 
+	GoogleSignIn(googleid,googlename,googleEmail,googleaccesstoken,googlerefreshtoken,googletokenexpiry string) (models.TokenPatient, error) 
 	IndPatientDetails(patient_id string)(models.SignupdetailResponse,error)
 	UpdatePatientDetails(patient models.SignupdetailResponse) (models.PatientProfile,error)
 
