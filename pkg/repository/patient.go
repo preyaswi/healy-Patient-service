@@ -167,3 +167,32 @@ func (ur *patientRepository) ListPatients() ([]models.SignupdetailResponse, erro
 	}
 	return patientDetails, nil
 }
+func (ur *patientRepository)GetPatientGoogleDetailsByID(patientid string) (models.GooglePatientDetails, error)  {
+	var patient domain.Patient
+	var googleDetails models.GooglePatientDetails
+
+	// Find the patient by ID
+	err := ur.DB.Where("id = ?", patientid).First(&patient).Error
+	if err != nil {
+		return googleDetails, err
+	}
+
+	// Map the patient details to GooglePatientDetails
+	googleDetails = models.GooglePatientDetails{
+		GoogleID:     patient.GoogleId,
+		GoogleEmail:  patient.Email,
+		AccessToken:  patient.AccessToken,
+		RefreshToken: patient.RefreshToken,
+		TokenExpiry:  patient.TokenExpiry,
+	}
+
+	return googleDetails, nil
+}
+func (ur *patientRepository)UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry string) error   {
+	return ur.DB.Model(&domain.Patient{}).Where("google_id = ?", googleID).
+	Updates(map[string]interface{}{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+		"token_expiry":  tokenExpiry,
+	}).Error
+}

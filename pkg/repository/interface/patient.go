@@ -17,4 +17,6 @@ type PatientRepository interface {
 	UpdateName(name string, PatientID string) error
 	UserDetails(userID string) (models.PatientProfile, error)
 	ListPatients()([]models.SignupdetailResponse,error)
+	GetPatientGoogleDetailsByID(patientid string) (models.GooglePatientDetails, error)
+	UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry string) error 
 }

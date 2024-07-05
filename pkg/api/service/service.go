@@ -90,3 +90,23 @@ func (p *PatientServer)ListPatients(ctx context.Context,req *pb.Req) (*pb.Listpa
 	},nil
 
 }
+func (p *PatientServer)GetPatientGoogleDetailsByID(ctx context.Context,req *pb.Idreq) (*pb.GooglePatientDetails, error)  {
+	res,err:=p.patientUseCase.GetPatientGoogleDetailsByID(req.UserId)
+	if err!=nil{
+		return &pb.GooglePatientDetails{},err
+	}
+	return &pb.GooglePatientDetails{
+		Googleid: res.GoogleID,
+		Email: res.GoogleEmail,
+		Accesstoken: res.AccessToken,
+		Refreshtoken: res.RefreshToken,
+		Tokenexpiry: res.TokenExpiry,
+	},nil
+}
+func (p *PatientServer)UpdatePatientGoogleToken(ctx context.Context,req *pb.UpdateGoogleTokenReq) (*pb.UpdateGoogleTokenRes, error)  {
+	err:=p.patientUseCase.UpdatePatientGoogleToken(req.GoogleID,req.AccessToken,req.RefreshToken,req.TokenExpiry)
+	if err!=nil{
+		return &pb.UpdateGoogleTokenRes{},err
+	}
+	return &pb.UpdateGoogleTokenRes{},nil
+}

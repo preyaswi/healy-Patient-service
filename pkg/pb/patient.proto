@@ -7,6 +7,8 @@ service Patient{
     rpc IndPatientDetails(idreq)returns(PatientDetails){};
 	rpc UpdatePatientDetails(UpdateRequest)returns(InPatientDetails){};
 	rpc ListPatients(req)returns(listpares){};
+	rpc GetPatientGoogleDetailsByID(idreq)returns(GooglePatientDetails){};
+    rpc UpdatePatientGoogleToken(UpdateGoogleTokenReq)returns(UpdateGoogleTokenRes){};
 
 }
 message GoogleSignInRequest{
@@ -70,3 +72,17 @@ message req{}
 message listpares{
 	repeated PatientDetails pali=1;
 }
+message GooglePatientDetails{
+   string googleid=1;
+   string email=2;
+   string accesstoken=3;
+   string refreshtoken=4;
+   string tokenexpiry=5;
+}
+message UpdateGoogleTokenReq{
+string googleID=1;
+string accessToken=2;
+string refreshToken=3;
+string tokenExpiry=4;
+}
+message UpdateGoogleTokenRes{}

@@ -46,3 +46,10 @@ type PatientProfile struct{
 	Gender        string
 	Contactnumber string
 }
+type GooglePatientDetails struct {
+	GoogleID     string
+	GoogleEmail  string
+	AccessToken  string
+	RefreshToken string
+	TokenExpiry  string
+}

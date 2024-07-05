@@ -10,4 +10,7 @@ type PatientUseCase interface {
 	UpdatePatientDetails(patient models.SignupdetailResponse) (models.PatientProfile,error)
 
 	ListPatients() ([]models.SignupdetailResponse, error)
+
+	GetPatientGoogleDetailsByID(patientid string) (models.GooglePatientDetails, error)
+	UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry string) error 
 }

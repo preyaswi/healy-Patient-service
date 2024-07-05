@@ -97,3 +97,17 @@ func (pr *patientUseCase) ListPatients() ([]models.SignupdetailResponse, error) 
 	}
 	return patients, nil
 }
+func (pr *patientUseCase)GetPatientGoogleDetailsByID(patientid string) (models.GooglePatientDetails, error)  {
+	patientdetails,err:=pr.patientRepository.GetPatientGoogleDetailsByID(patientid)
+	if err!=nil{
+		return models.GooglePatientDetails{},err
+	}
+	return patientdetails,nil
+}
+func (pr *patientUseCase)UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry string) error   {
+	err:=pr.patientRepository.UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry)
+	if err!=nil{
+		return err
+	}
+	return nil
+}
