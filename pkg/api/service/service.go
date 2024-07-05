@@ -50,19 +50,19 @@ func (p *PatientServer)IndPatientDetails(ctx context.Context,req *pb.Idreq) (*pb
 		Contactnumber: doctor.Contactnumber,
 	},nil
 }
-func (p *PatientServer) UpdatePatientDetails(ctx context.Context,req *pb.UpdateRequest) (*pb.InPatientDetails, error){
+func (p *PatientServer)UpdatePatientDetails(ctx context.Context,req *pb.PatientDetails) (*pb.PatientDetails, error){
 	patient:=models.SignupdetailResponse{
-		Id:req.PatientId,
-		Fullname: req.InPatientDetails.Fullname,
-		Email: req.InPatientDetails.Email,
-		Gender: req.InPatientDetails.Gender,
-		Contactnumber: req.InPatientDetails.Contactnumber,
+		Id:req.Id,
+		Fullname: req.Fullname,
+		Email: req.Email,
+		Gender: req.Gender,
+		Contactnumber: req.Contactnumber,
 	}
 	res,err:=p.patientUseCase.UpdatePatientDetails(patient)
 	if err!=nil{
-		return &pb.InPatientDetails{},err
+		return &pb.PatientDetails{},err
 	}
-	return &pb.InPatientDetails{
+	return &pb.PatientDetails{
 		Fullname: res.Fullname,
 		Email: res.Email,
 		Gender: res.Gender,

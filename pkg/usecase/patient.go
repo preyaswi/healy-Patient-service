@@ -19,8 +19,8 @@ func NewPatientUseCase(repository interfaces.PatientRepository) usecaseint.Patie
 	}
 }
 
-func (pr *patientUseCase) GoogleSignIn(googleid, googlename, googleEmail,googleaccesstoken,googlerefreshtoken,googletokenexpiry   string) (models.TokenPatient, error) {
-	patient, err := pr.patientRepository.FindOrCreatePatientByGoogleID(googleid, googleEmail, googlename,googleaccesstoken,googlerefreshtoken,googletokenexpiry)
+func (pr *patientUseCase) GoogleSignIn(googleid, googlename, googleEmail, googleaccesstoken, googlerefreshtoken, googletokenexpiry string) (models.TokenPatient, error) {
+	patient, err := pr.patientRepository.FindOrCreatePatientByGoogleID(googleid, googleEmail, googlename, googleaccesstoken, googlerefreshtoken, googletokenexpiry)
 	if err != nil {
 		return models.TokenPatient{}, err
 	}
@@ -46,49 +46,55 @@ func (pr *patientUseCase) IndPatientDetails(patient_id string) (models.Signupdet
 	}
 	return pateint, nil
 }
-func (pr *patientUseCase) UpdatePatientDetails(patient models.SignupdetailResponse) (models.PatientProfile, error) {
-    fmt.Println(patient.Email, "email")
+func (pr *patientUseCase) UpdatePatientDetails(patient models.SignupdetailResponse) (models.SignupdetailResponse, error) {
+	fmt.Println(patient, "patient details")
 
-    // Update email if provided and not already existing
-    if patient.Email != "" {
-        userExist := pr.patientRepository.CheckPatientAvailability(patient.Email)
-        if userExist {
-            return models.PatientProfile{}, errors.New("user already exists, choose a different email")
-        }
-        if err := pr.patientRepository.UpdatePatientEmail(patient.Email, patient.Id); err != nil {
-            return models.PatientProfile{}, err
-        }
-    }
+	// Update email if provided and not already existing
+	if patient.Email != "" {
+		userExist := pr.patientRepository.CheckPatientAvailability(patient.Email)
+		if userExist {
+			return models.SignupdetailResponse{}, errors.New("user already exists, choose a different email")
+		}
+		if err := pr.patientRepository.UpdatePatientEmail(patient.Email, patient.Id); err != nil {
+			return models.SignupdetailResponse{}, err
+		}
+	}
 
-    // Update contact number if provided and not already existing
-    if patient.Contactnumber != "" {
-        userExistByPhone, err := pr.patientRepository.CheckPatientExistsByPhone(patient.Contactnumber)
-        fmt.Println(userExistByPhone, "userExistByPhone")
-        if err != nil {
-            return models.PatientProfile{}, errors.New("error with server")
-        }
-        if userExistByPhone != nil {
-            return models.PatientProfile{}, errors.New("user with this phone number already exists")
-        }
-        if err := pr.patientRepository.UpdatePatientPhone(patient.Contactnumber, patient.Id); err != nil {
-            return models.PatientProfile{}, err
-        }
-    }
+	// Update contact number if provided and not already existing
+	if patient.Contactnumber != "" {
+		userExistByPhone, err := pr.patientRepository.CheckPatientExistsByPhone(patient.Contactnumber)
+		fmt.Println(userExistByPhone, "userExistByPhone")
+		if err != nil {
+			return models.SignupdetailResponse{}, errors.New("error with server")
+		}
+		if userExistByPhone != nil {
+			return models.SignupdetailResponse{}, errors.New("user with this phone number already exists")
+		}
+		if err := pr.patientRepository.UpdatePatientPhone(patient.Contactnumber, patient.Id); err != nil {
+			return models.SignupdetailResponse{}, err
+		}
+	}
 
-    // Update name if provided
-    if patient.Fullname != "" {
-        if err := pr.patientRepository.UpdateName(patient.Fullname, patient.Id); err != nil {
-            return models.PatientProfile{}, err
-        }
-    }
+	// Update name if provided
+	if patient.Fullname != "" {
+		if err := pr.patientRepository.UpdateName(patient.Fullname, patient.Id); err != nil {
+			return models.SignupdetailResponse{}, err
+		}
+	}
+	if patient.Gender!=""{
 
-    // Retrieve and return updated user details
-    updatedPatient, err := pr.patientRepository.UserDetails(patient.Id)
-    if err != nil {
-        return models.PatientProfile{}, errors.New("could not get user details")
-    }
+		if err:=pr.patientRepository.UpdateGender(patient.Gender,patient.Id);err!=nil{
+				return models.SignupdetailResponse{},err
+			
+		}
+	}
+	// Retrieve and return updated user details
+	updatedPatient, err := pr.patientRepository.IndPatientDetails(patient.Id)
+	if err != nil {
+		return models.SignupdetailResponse{}, errors.New("could not get user details")
+	}
 
-    return updatedPatient, nil
+	return updatedPatient, nil
 }
 func (pr *patientUseCase) ListPatients() ([]models.SignupdetailResponse, error) {
 	patients, err := pr.patientRepository.ListPatients()
@@ -97,16 +103,16 @@ func (pr *patientUseCase) ListPatients() ([]models.SignupdetailResponse, error) 
 	}
 	return patients, nil
 }
-func (pr *patientUseCase)GetPatientGoogleDetailsByID(patientid string) (models.GooglePatientDetails, error)  {
-	patientdetails,err:=pr.patientRepository.GetPatientGoogleDetailsByID(patientid)
-	if err!=nil{
-		return models.GooglePatientDetails{},err
+func (pr *patientUseCase) GetPatientGoogleDetailsByID(patientid string) (models.GooglePatientDetails, error) {
+	patientdetails, err := pr.patientRepository.GetPatientGoogleDetailsByID(patientid)
+	if err != nil {
+		return models.GooglePatientDetails{}, err
 	}
-	return patientdetails,nil
+	return patientdetails, nil
 }
-func (pr *patientUseCase)UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry string) error   {
-	err:=pr.patientRepository.UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry)
-	if err!=nil{
+func (pr *patientUseCase) UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry string) error {
+	err := pr.patientRepository.UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry)
+	if err != nil {
 		return err
 	}
 	return nil

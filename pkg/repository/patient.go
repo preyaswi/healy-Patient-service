@@ -138,16 +138,13 @@ func (ur *patientRepository) UpdateName(name string, PatientID string) error {
 	return nil
 
 }
-func (ur *patientRepository) UserDetails(userID string) (models.PatientProfile, error) {
-
-	var userDetails models.PatientProfile
-	err := ur.DB.Raw("select patient.fullname,patient.email,patient.gender,patient.contactnumber from patient  where patient.id = ?", userID).Row().Scan(&userDetails.Fullname, &userDetails.Email, &userDetails.Gender, &userDetails.Contactnumber)
+func (ur *patientRepository)UpdateGender(gender string,patientid string)error  {
+	err := ur.DB.Exec("update patients set gender = ? where id = ?", gender,patientid).Error
 	if err != nil {
-		return models.PatientProfile{}, errors.New("could not get user details")
+		return err
 	}
-	return userDetails, nil
+	return nil
 }
-
 func (ur *patientRepository) ListPatients() ([]models.SignupdetailResponse, error) {
 	row, err := ur.DB.Raw("select id,fullname,email,gender,contactnumber from patients").Rows()
 	if err != nil {

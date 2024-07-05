@@ -9,7 +9,6 @@ type Patient struct {
 	GoogleId      string `json:"googleid" gorm:"unique;not null"`
 	Fullname      string `json:"fullname" gorm:"validate:required"`
 	Email         string `json:"email" gorm:"validate:required"`
-	Password      string `json:"password" gorm:"validate:required"`
 	Gender        string `json:"gender" gorm:"validate:required"`
 	Contactnumber string `json:"contactnumber" gorm:"validate:required"`
 	AccessToken string `json:"accesstoken"`
