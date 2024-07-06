@@ -11,10 +11,10 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot load config: ", err)
 	}
-	server,err:=di.InitializeApi(config)
-	if err!=nil{
+	server, err := di.InitializeApi(config)
+	if err != nil {
 		log.Fatal("cannot start server: ", err)
-	}else{
+	} else {
 		server.Start()
 	}
 }

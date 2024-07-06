@@ -10,7 +10,7 @@ import (
 )
 
 type AuthUserClaims struct {
-	Id    string    `json:"id"`
+	Id    string `json:"id"`
 	Email string `json:"email"`
 	Role  string `json:"role"`
 	jwt.StandardClaims

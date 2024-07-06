@@ -81,11 +81,11 @@ func (pr *patientUseCase) UpdatePatientDetails(patient models.SignupdetailRespon
 			return models.SignupdetailResponse{}, err
 		}
 	}
-	if patient.Gender!=""{
+	if patient.Gender != "" {
 
-		if err:=pr.patientRepository.UpdateGender(patient.Gender,patient.Id);err!=nil{
-				return models.SignupdetailResponse{},err
-			
+		if err := pr.patientRepository.UpdateGender(patient.Gender, patient.Id); err != nil {
+			return models.SignupdetailResponse{}, err
+
 		}
 	}
 	// Retrieve and return updated user details

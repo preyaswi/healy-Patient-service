@@ -138,8 +138,8 @@ func (ur *patientRepository) UpdateName(name string, PatientID string) error {
 	return nil
 
 }
-func (ur *patientRepository)UpdateGender(gender string,patientid string)error  {
-	err := ur.DB.Exec("update patients set gender = ? where id = ?", gender,patientid).Error
+func (ur *patientRepository) UpdateGender(gender string, patientid string) error {
+	err := ur.DB.Exec("update patients set gender = ? where id = ?", gender, patientid).Error
 	if err != nil {
 		return err
 	}
@@ -164,7 +164,7 @@ func (ur *patientRepository) ListPatients() ([]models.SignupdetailResponse, erro
 	}
 	return patientDetails, nil
 }
-func (ur *patientRepository)GetPatientGoogleDetailsByID(patientid string) (models.GooglePatientDetails, error)  {
+func (ur *patientRepository) GetPatientGoogleDetailsByID(patientid string) (models.GooglePatientDetails, error) {
 	var patient domain.Patient
 	var googleDetails models.GooglePatientDetails
 
@@ -185,11 +185,11 @@ func (ur *patientRepository)GetPatientGoogleDetailsByID(patientid string) (model
 
 	return googleDetails, nil
 }
-func (ur *patientRepository)UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry string) error   {
+func (ur *patientRepository) UpdatePatientGoogleToken(googleID, accessToken, refreshToken, tokenExpiry string) error {
 	return ur.DB.Model(&domain.Patient{}).Where("google_id = ?", googleID).
-	Updates(map[string]interface{}{
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
-		"token_expiry":  tokenExpiry,
-	}).Error
+		Updates(map[string]interface{}{
+			"access_token":  accessToken,
+			"refresh_token": refreshToken,
+			"token_expiry":  tokenExpiry,
+		}).Error
 }

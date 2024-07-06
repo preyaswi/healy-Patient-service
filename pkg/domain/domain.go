@@ -11,10 +11,9 @@ type Patient struct {
 	Email         string `json:"email" gorm:"validate:required"`
 	Gender        string `json:"gender" gorm:"validate:required"`
 	Contactnumber string `json:"contactnumber" gorm:"validate:required"`
-	AccessToken string `json:"accesstoken"`
-	RefreshToken string `json:"refreshtoken"`
-	TokenExpiry string `json:"tokenexpiry"`
-
+	AccessToken   string `json:"accesstoken"`
+	RefreshToken  string `json:"refreshtoken"`
+	TokenExpiry   string `json:"tokenexpiry"`
 }
 type Prescription struct {
 	ID         uint      `json:"id" gorm:"primaryKey"`
